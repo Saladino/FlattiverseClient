@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Flattiverse;
 
@@ -6,16 +7,33 @@ namespace FlattiverseClient
 {
     public class Controller
     {
-        private const string EMail = "kowiit00@hs-esslingen.de";
-        private const string Password = "ZBU0RXSX94M92KRP";
-        private const string Nickname = "Saladino";
-        private const string ShipType = "Scout1";
-        private const string ShipName = "FliegendeTasse";
+        private const string EMail      = "kowiit00@hs-esslingen.de";
+        private const string Password   = "ZBU0RXSX94M92KRP";
+        private const string Nickname   = "Saladino";
+        private const string ShipType   = "Scout1";
+        private const string ShipName   = "FliegendeTasse";
 
         private Connector _connector;
         private bool _running;
         private UniverseGroup universeGroup;
         private Ship _ship;
+        private List<FlattiverseMessage> _messages = new List<FlattiverseMessage>();
+        ReaderWriterLock messageLock = new ReaderWriterLock(); 
+
+        public delegate void FlattiveseChanged();
+
+        public event FlattiveseChanged NewMessageEvent;
+
+        public List<FlattiverseMessage> Messages
+        {
+            get
+            {
+                messageLock.AcquireReaderLock(100);
+                List<FlattiverseMessage> listCopy = new List<FlattiverseMessage>(_messages);
+                messageLock.ReleaseReaderLock();
+                return listCopy;
+            }
+        }
 
         public void Connect()
         {
@@ -65,10 +83,30 @@ namespace FlattiverseClient
 
             while (_running)
             {
+                GetPendingMessages();
                 flowControl.Commit();
                 flowControl.Wait();
             }
             _connector.Close();
+        }
+
+        private void GetPendingMessages()
+        {
+            FlattiverseMessage message;
+            bool messagesReceived = false;
+            messageLock.AcquireWriterLock(100);
+
+            while (_connector.NextMessage(out message))
+            {
+                _messages.Add(message);
+                messagesReceived = true;
+            }
+            messageLock.ReleaseWriterLock();
+
+            if (messagesReceived)
+            {
+                NewMessageEvent?.Invoke();
+            }
         }
     }
 }
