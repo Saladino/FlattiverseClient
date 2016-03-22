@@ -15,7 +15,7 @@ namespace FlattiverseClient
 
         private Connector _connector;
         private bool _running;
-        private UniverseGroup universeGroup;
+        private UniverseGroup _universeGroup;
         private Ship _ship;
         private List<FlattiverseMessage> _messages = new List<FlattiverseMessage>();
         ReaderWriterLock messageLock = new ReaderWriterLock(); 
@@ -42,15 +42,15 @@ namespace FlattiverseClient
 
         public void ListUniverses()
         {
-            foreach (var universeGroup in _connector.UniverseGroups)
+            foreach (var ug in _connector.UniverseGroups)
             {
-                Console.WriteLine($"{universeGroup.Name} - {universeGroup.Description} - {universeGroup.Difficulty} - max. {universeGroup.MaxShipsPerPlayer} ships");
+                Console.WriteLine($"{ug.Name} - {ug.Description} - {ug.Difficulty} - max. {ug.MaxShipsPerPlayer} ships");
 
-                foreach (var universe in universeGroup.Universes)
+                foreach (var universe in ug.Universes)
                 {
                     Console.WriteLine($"\tUniverse: {universe.name}");
                 }
-                foreach (var team in universeGroup.Teams)
+                foreach (var team in ug.Teams)
                 {
                     Console.WriteLine($"\tTeam: {team.Name}");
                 }
@@ -64,22 +64,21 @@ namespace FlattiverseClient
 
         public void Enter(string universeGroupName, string teamName = "None")
         {
-            universeGroup = _connector.UniverseGroups[universeGroupName];
-            Team team = universeGroup.Teams[teamName];
+            _universeGroup = _connector.UniverseGroups[universeGroupName];
+            Team team = _universeGroup.Teams[teamName];
 
-            universeGroup.Join(Nickname, team);
+            _universeGroup.Join(Nickname, team);
 
-            _ship = universeGroup.RegisterShip(ShipType, ShipName);
+            _ship = _universeGroup.RegisterShip(ShipType, ShipName);
 
-            Thread thread = new Thread(Run);
-            thread.Name = "MainLoop";
+            Thread thread = new Thread(Run) {Name = "MainLoop"};
             thread.Start();
         }
 
         private void Run()
         {
             _running = true;
-            UniverseGroupFlowControl flowControl = universeGroup.GetNewFlowControl();
+            UniverseGroupFlowControl flowControl = _universeGroup.GetNewFlowControl();
 
             while (_running)
             {
