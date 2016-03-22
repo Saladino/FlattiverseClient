@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.textBoxMessages = new System.Windows.Forms.RichTextBox();
+            this.radarScreen = new System.Windows.Forms.Panel();
             this.SuspendLayout();
             // 
             // textBoxMessages
@@ -41,11 +42,22 @@
             this.textBoxMessages.Text = "";
             this.textBoxMessages.WordWrap = false;
             // 
+            // radarScreen
+            // 
+            this.radarScreen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.radarScreen.BackColor = System.Drawing.Color.Black;
+            this.radarScreen.Location = new System.Drawing.Point(365, 2);
+            this.radarScreen.Name = "radarScreen";
+            this.radarScreen.Size = new System.Drawing.Size(512, 428);
+            this.radarScreen.TabIndex = 1;
+            // 
             // View
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(880, 556);
+            this.Controls.Add(this.radarScreen);
             this.Controls.Add(this.textBoxMessages);
             this.Name = "View";
             this.Text = "Flattiverse Client";
@@ -57,6 +69,7 @@
         #endregion
 
         private System.Windows.Forms.RichTextBox textBoxMessages;
+        private System.Windows.Forms.Panel radarScreen;
     }
 }
 

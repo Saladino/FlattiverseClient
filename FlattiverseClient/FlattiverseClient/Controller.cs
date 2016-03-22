@@ -35,6 +35,16 @@ namespace FlattiverseClient
             }
         }
 
+        public bool ShipReady => _ship != null;
+
+        public float ShipRadius
+        {
+            get
+            {
+                return ShipReady ? _ship.Radius : -1;
+            }
+        }
+
         public void Connect()
         {
             _connector = new Connector(EMail, Password);
