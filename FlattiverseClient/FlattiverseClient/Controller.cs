@@ -18,11 +18,16 @@ namespace FlattiverseClient
         private UniverseGroup _universeGroup;
         private Ship _ship;
         private List<FlattiverseMessage> _messages = new List<FlattiverseMessage>();
-        ReaderWriterLock messageLock = new ReaderWriterLock(); 
+        ReaderWriterLock messageLock = new ReaderWriterLock();
+        private float _scanAngle;
+        private Map _map = new Map();
+        private int _yImpulse;
+        private int _xImpulse;
 
         public delegate void FlattiveseChanged();
 
         public event FlattiveseChanged NewMessageEvent;
+        public event FlattiveseChanged NewScanEvent;
 
         public List<FlattiverseMessage> Messages
         {
@@ -33,6 +38,16 @@ namespace FlattiverseClient
                 messageLock.ReleaseReaderLock();
                 return listCopy;
             }
+        }
+
+        public int EnergyPercent
+        {
+            get { return (int) (_ship.Energy/_ship.EnergyMax*100); }
+        }
+
+        public List<Unit> Units
+        {
+            get { return _map.Units; }
         }
 
         public bool ShipReady => _ship != null;
@@ -89,14 +104,27 @@ namespace FlattiverseClient
         {
             _running = true;
             UniverseGroupFlowControl flowControl = _universeGroup.GetNewFlowControl();
-
+            _ship.Continue();
             while (_running)
             {
+                if(!_ship.IsAlive || !_ship.IsActive) Continue();
+
                 GetPendingMessages();
                 flowControl.Commit();
+                Scan();
+                Move();
                 flowControl.Wait();
             }
             _connector.Close();
+        }
+
+        private void Continue()
+        {
+            if (!_ship.IsAlive || !_ship.IsActive)
+            {
+                _map = new Map();
+                _ship.Continue();
+            }
         }
 
         private void GetPendingMessages()
@@ -116,6 +144,86 @@ namespace FlattiverseClient
             {
                 NewMessageEvent?.Invoke();
             }
+        }
+
+        private void Scan()
+        {
+            _scanAngle = (_scanAngle + _ship.ScannerDegreePerScan < 360)
+                ? _scanAngle + _ship.ScannerDegreePerScan - 2
+                : _scanAngle + _ship.ScannerDegreePerScan - 362;
+            try
+            {
+                List<Unit> scannedUnits = _ship.Scan(_scanAngle, _ship.ScannerArea.Limit);
+                _map.Insert(scannedUnits);
+                NewScanEvent?.Invoke();
+            }
+            catch (GameException e)
+            {
+                if (e.ErrorNumber == 84) Continue();
+                else
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+        }
+
+        public void Impulse(int x, int y)
+        {
+            _xImpulse += x;
+            _yImpulse += y;
+        }
+
+        private void Move()
+        {
+            float direction;
+            if (_xImpulse > 0)
+            {
+                if (_yImpulse > 0) direction = 315;
+                else if (_yImpulse < 0) direction = 45;
+                else
+                {
+                    direction = 0;
+                }
+            }
+            else if (_xImpulse < 0)
+            {
+                if (_yImpulse > 0) direction = 135;
+                else if (_yImpulse < 0) direction = 225;
+                else
+                {
+                    direction = 180;
+                }
+            }
+            else
+            {
+                if (_yImpulse > 0) direction = 90;
+                else if (_yImpulse < 0) direction = 270;
+                else
+                {
+                    direction = 0;
+                }
+            }
+
+            if (_xImpulse != 0 || _yImpulse != 0)
+            {
+                Vector acceleration = Vector.FromAngleLength(direction, _ship.EngineAcceleration.Limit);
+                try
+                {
+                    _ship.Move(acceleration);
+
+                }
+                catch (GameException e)
+                {
+                    if (e.ErrorNumber == 84) Continue();
+                    else
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+            }
+
+            _xImpulse = 0;
+            _yImpulse = 0;
         }
     }
 }
