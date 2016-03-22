@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Controller.cs" />
     <Compile Include="Map.cs" />
+    <Compile Include="Tag.cs" />
     <Compile Include="View.cs">
       <SubType>Form</SubType>
     </Compile>
