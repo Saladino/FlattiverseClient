@@ -25,7 +25,7 @@ namespace FlattiverseClient
             //get outdated data
             foreach (var mapUnit in mapUnits.Values)
             {
-                if (_tick - ((Tag)mapUnit.Tag).ScannedAt > 8)
+                if (_tick - ((Tag)mapUnit.Tag).ScannedAt > 8)// && !mapUnit.IsSolid)
                 {
                     outdatedMapUnits.Add(mapUnit.Name);
                 }
