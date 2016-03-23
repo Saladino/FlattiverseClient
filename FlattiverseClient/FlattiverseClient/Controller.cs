@@ -40,6 +40,8 @@ namespace FlattiverseClient
             }
         }
 
+        public bool Connected { get; set; }
+
         public int EnergyPercent
         {
             get { return (int) (_ship.Energy/_ship.EnergyMax*100); }
@@ -63,6 +65,7 @@ namespace FlattiverseClient
         public void Connect()
         {
             _connector = new Connector(EMail, Password);
+            Connected = true;
         }
 
         public void ListUniverses()
@@ -116,6 +119,7 @@ namespace FlattiverseClient
                 flowControl.Wait();
             }
             _connector.Close();
+            Connected = false;
         }
 
         private void Continue()
@@ -176,6 +180,7 @@ namespace FlattiverseClient
         private void Move()
         {
             float direction;
+            Console.WriteLine($"{_xImpulse}, {_yImpulse}");
             if (_xImpulse > 0)
             {
                 if (_yImpulse > 0) direction = 315;

@@ -35,7 +35,8 @@
             // 
             // textBoxMessages
             // 
-            this.textBoxMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxMessages.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxMessages.Location = new System.Drawing.Point(365, 436);
             this.textBoxMessages.Name = "textBoxMessages";
             this.textBoxMessages.ReadOnly = true;
@@ -46,7 +47,8 @@
             // 
             // radarScreen
             // 
-            this.radarScreen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.radarScreen.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.radarScreen.BackColor = System.Drawing.Color.Black;
             this.radarScreen.Location = new System.Drawing.Point(365, 2);
@@ -56,6 +58,7 @@
             // 
             // energyBar
             // 
+            this.energyBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.energyBar.Location = new System.Drawing.Point(12, 534);
             this.energyBar.Name = "energyBar";
             this.energyBar.Size = new System.Drawing.Size(347, 23);
